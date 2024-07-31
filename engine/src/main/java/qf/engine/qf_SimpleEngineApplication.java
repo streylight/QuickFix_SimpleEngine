@@ -1,42 +1,31 @@
 package qf.engine;
 
 import quickfix.*;
+/**
+ * Hello world!
+ *
+ */
+public class qf_SimpleEngineApplication {
+    public static void main( String[] args ) throws ConfigError, InterruptedException {
+        try {
+            System.out.println("Hello World!");
+            SessionSettings settings = new SessionSettings("./src/main/resources/qf_SimpleEngine.cfg");
+            qf_SimpleEngine application = new qf_SimpleEngine();
+            MessageStoreFactory messageStoreFactory = new FileStoreFactory(settings);
+            LogFactory logFactory = new FileLogFactory(settings);
+            MessageFactory messageFactory = new DefaultMessageFactory();
 
-public class qf_SimpleEngineApplication extends quickfix.MessageCracker implements Application {
-    
-    @Override
-    public void onCreate(SessionID sessionId) {
-        System.out.println("Session created: " + sessionId);
-    }
-
-    @Override
-    public void onLogon(SessionID sessionId) {
-        System.out.println("Logon successful: " + sessionId);
-    }
-
-    @Override
-    public void onLogout(SessionID sessionId) {
-        System.out.println("Logout: " + sessionId);
-    }
-
-    @Override
-    public void toAdmin(Message message, SessionID sessionId) {
-        System.out.println("Sending admin message: " + message);
-    }
-
-    @Override
-    public void fromAdmin(Message message, SessionID sessionId) throws FieldNotFound, IncorrectDataFormat, IncorrectTagValue, RejectLogon {
-        System.out.println("Received admin message: " + message);
-    }
-
-    @Override
-    public void toApp(Message message, SessionID sessionId) throws DoNotSend {
-        System.out.println("Sending app message: " + message);
-    }
-
-    @Override
-    public void fromApp(Message message, SessionID sessionId) throws FieldNotFound, IncorrectDataFormat, IncorrectTagValue, UnsupportedMessageType {
-        System.out.println("Received app message: " + message);
-        crack(message, sessionId); 
+            Acceptor acceptor = new SocketAcceptor(application, messageStoreFactory, settings, logFactory, messageFactory);
+            System.out.println("Starting acceptor...");
+            acceptor.start();
+            System.out.println("Acceptor started...");
+            
+            while (true) {
+                System.out.println("Engine running...");
+                Thread.sleep(1000);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

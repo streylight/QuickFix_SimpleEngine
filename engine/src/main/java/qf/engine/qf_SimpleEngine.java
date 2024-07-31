@@ -1,20 +1,48 @@
 package qf.engine;
 
 import quickfix.*;
-/**
- * Hello world!
- *
- */
-public class qf_SimpleEngine {
-    public static void main( String[] args ) throws ConfigError {
-        System.out.println( "Hello World!" );
-        SessionSettings settings = new SessionSettings("./src/main/resources/qf_SimpleEngine.cfg");
-        qf_SimpleEngineApplication application = new qf_SimpleEngineApplication();
-        MessageStoreFactory messageStoreFactory = new FileStoreFactory(settings);
-        LogFactory logFactory = new FileLogFactory(settings);
-        MessageFactory messageFactory = new DefaultMessageFactory();
+import quickfix.MessageCracker.Handler;
 
-        Initiator initiator = new SocketInitiator(application, messageStoreFactory, settings, logFactory, messageFactory);
-        initiator.start();
+public class qf_SimpleEngine extends quickfix.MessageCracker implements Application {
+    
+    @Override
+    public void onCreate(SessionID sessionId) {
+        System.out.println("Session created: " + sessionId);
+    }
+
+    @Override
+    public void onLogon(SessionID sessionId) {
+        System.out.println("Logon successful: " + sessionId);
+    }
+
+    @Override
+    public void onLogout(SessionID sessionId) {
+        System.out.println("Logout: " + sessionId);
+    }
+
+    @Override
+    public void toAdmin(Message message, SessionID sessionId) {
+        System.out.println("Sending admin message: " + message);
+    }
+
+    @Override
+    public void fromAdmin(Message message, SessionID sessionId) throws FieldNotFound, IncorrectDataFormat, IncorrectTagValue, RejectLogon {
+        System.out.println("Received admin message: " + message);
+    }
+
+    @Override
+    public void toApp(Message message, SessionID sessionId) throws DoNotSend {
+        System.out.println("Sending app message: " + message);
+    }
+
+    @Override
+    public void fromApp(Message message, SessionID sessionId) throws FieldNotFound, IncorrectDataFormat, IncorrectTagValue, UnsupportedMessageType {
+        System.out.println("Received app message: " + message);
+        crack(message, sessionId); 
+    }
+
+    @Handler
+    public void onMessage(quickfix.fix44.NewOrderSingle message, SessionID sessionID) throws FieldNotFound, UnsupportedMessageType, IncorrectTagValue {
+        System.out.println("Received NewOrderSingle: " + message);
     }
 }
