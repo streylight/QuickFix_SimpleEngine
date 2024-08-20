@@ -1,1 +1,2 @@
 * Fix "required missing tag"
+* Continue flushing out order flow for a new order: Logon, ack, submit, ack, fill, ack, logoff
