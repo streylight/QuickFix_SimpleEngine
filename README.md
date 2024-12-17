@@ -1,2 +1,2 @@
 # QuickFix_SimpleEngine
-Simple FIX engine built on Quickfix/J: https://github.com/quickfix-j/quickfixj/tree/master
+Simple FIX engine & client built on Quickfix/J: https://github.com/quickfix-j/quickfixj/tree/master
