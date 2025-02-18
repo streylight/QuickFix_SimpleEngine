@@ -1,0 +1,21 @@
+Legend
+---------------
+- notes
+* todo items
+// comments
+---------------
+
+## TODO
+
+high
+* implement getCreationTime
+* clean up print statements for glide connectivity
+* improve set next & inc seq number logic
+
+low
+* flush out order flow for new order
+* determine if inc target seq num makes any sense (i dont think so)
+
+## [02-18-25]
+- added functionality to write set and incr sender seq number to Amazon MemoryDB
+- verified connectivity to MDB cluster via an EC2 instance in same VPC

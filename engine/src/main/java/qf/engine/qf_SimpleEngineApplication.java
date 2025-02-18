@@ -1,5 +1,9 @@
 package qf.engine;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 import quickfix.*;
 /**
  * Hello world!
@@ -9,9 +13,10 @@ public class qf_SimpleEngineApplication {
     public static void main( String[] args ) throws ConfigError, InterruptedException {
         try {
             System.out.println("Hello World!");
+        
             SessionSettings settings = new SessionSettings("./src/main/resources/qf_SimpleEngine.cfg");
             qf_SimpleEngine application = new qf_SimpleEngine();
-            MessageStoreFactory messageStoreFactory = new FileStoreFactory(settings);
+            MessageStoreFactory messageStoreFactory = new qf_MessageStoreFactory();
             LogFactory logFactory = new FileLogFactory(settings);
             MessageFactory messageFactory = new DefaultMessageFactory();
 

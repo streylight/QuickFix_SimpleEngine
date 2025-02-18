@@ -9,7 +9,11 @@ import glide.api.models.configuration.RequestRoutingConfiguration;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import static glide.api.models.GlideString.gs;
 
@@ -18,34 +22,65 @@ public class qf_MessageStore implements MessageStore {
     private final GlideClusterClient glideClient;
 
     private static final Logger logger = Logger.getLogger(qf_MessageStore.class.getName());
+
+    private static final String SEQ_KEY = "{f}s"; // seq hash
+    private static final String MSG_KEY = "{f}m"; // msg hash
+    private static final String SENDER_FIELD = "s";
+    private static final String TARGET_FIELD = "t";
+
     private int nextSenderSeqNum = 1;
     private int nextTargetSeqNum = 1;
-    private String host = "";
+    private String host = System.getenv("MDB_HOST");
     private int port1 = 6379;
 
-    public qf_MessageStore(String clusterEndpoint, int port) {
+    public qf_MessageStore() {
+
+        // add console as handler for the java logger
+        SimpleFormatter formatter = new SimpleFormatter();
+        ConsoleHandler consoleHandler = new ConsoleHandler();
+        consoleHandler.setFormatter(formatter);
+        logger.addHandler(consoleHandler);
+
         // Create cluster configuration
         GlideClusterClientConfiguration config = GlideClusterClientConfiguration.builder()
-            .address(NodeAddress.builder().host(host).port(port1).build())
+            .address(NodeAddress.builder()
+            .host(host)
+            .port(port1).build())
             .useTLS(true)
             .build();
 
         // Initialize the client
         try {
+            logger.info("Initializing MemoryDB connection to host " + host);
             this.glideClient = GlideClusterClient.createClient(config).get();
+            logger.info("Glide client created successfully");
             System.out.println("Glide client created successfully");
-            System.out.println("PING: " + this.glideClient.ping(gs("PING")).get());
+            
+            // Test the connection by pinging the cluster
+            String pingResponse = this.glideClient.ping(gs("PING")).get().toString();
+            logger.info("MemoryDB Connection Test - PING response: " + pingResponse);
         } catch (Exception e) {
+            logger.severe("Failed to initialize MemoryDB connection: " + e.getMessage());
             throw new RuntimeException("Failed to initialize MemoryDB connection", e);
         }
     }
+
+    // this logic is wrong, TODO: fix
     @Override
     public void setNextSenderMsgSeqNum(int next) {
         logger.info("Updating Outgoing Sequence Number to: " + next);
-        nextSenderSeqNum = next;
-        // Write to your key-value database here
+        try {
+            Map<String, String> map = new HashMap<>();
+            map.put(SENDER_FIELD, String.valueOf(next));
+            glideClient.hset(SEQ_KEY, map).get();
+            nextSenderSeqNum = next;
+        } catch (Exception ex) {
+            logger.severe("Failed to update Outgoing Sequence Number: " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }
 
+    // same as above
     @Override
     public void setNextTargetMsgSeqNum(int next) {
         logger.info("Updating Incoming Sequence Number to: " + next);
@@ -86,8 +121,14 @@ public class qf_MessageStore implements MessageStore {
 
     @Override
     public void incrNextSenderMsgSeqNum() throws IOException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'incrNextSenderMsgSeqNum'");
+        logger.info("Incrementing Outgoing Sequence Number to: " + (nextSenderSeqNum + 1));
+        try {
+            glideClient.incr(SEQ_KEY);
+            nextSenderSeqNum++;
+        } catch (Exception ex) {
+            logger.severe("Failed to increment Outgoing Sequence Number: " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }
 
     @Override
