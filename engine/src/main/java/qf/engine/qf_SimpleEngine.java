@@ -97,6 +97,7 @@ public class qf_SimpleEngine extends quickfix.MessageCracker implements Applicat
 
     @Override
     public void fromAdmin(Message message, SessionID sessionId) throws FieldNotFound, IncorrectDataFormat, IncorrectTagValue, RejectLogon {
+        // 8=FIX.4.49=6735=A34=149=CLIENT52=20250219-17:20:02.33656=ENGINE98=0108=3010=117
         System.out.println("Received admin message: " + message);
     }
 
@@ -130,7 +131,7 @@ public class qf_SimpleEngine extends quickfix.MessageCracker implements Applicat
     }
 
     public ExecutionReport createExecutionReport(NewOrderSingle order, String execID, char ordStatus, char execType, double lastPrice, double lastQty) throws FieldNotFound {
-    
+        System.out.println("Creating ExecutionReport for order: " + order);
         ExecutionReport executionReport = new ExecutionReport(
             new OrderID(order.getClOrdID().getValue()),   // Use the ClOrdID from the order as the OrderID (or generate a new one)
             new ExecID(execID),                           // Execution ID (unique for each execution)

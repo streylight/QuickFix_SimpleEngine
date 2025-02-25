@@ -29,7 +29,7 @@ public class qf_ClientMessageSenderApplication {
 
         // init new session to connect to engine
         SessionID sessionID = new SessionID("FIX.4.4", "CLIENT", "ENGINE");
-
+        System.out.println("Sending new message SessionID: " + sessionID);
         qf_ClientMessageSender messageSender = new qf_ClientMessageSender(
             sessionID, 
             "123", 
@@ -40,12 +40,25 @@ public class qf_ClientMessageSenderApplication {
             100
         );
 
-        for (int i = 0; i < 10; i++) {
-            messageSender.sendNewOrderSingle();
-            System.out.println("Sending message " + i);
-            Thread.sleep(1000); // wait for 1 second between messages
+        // for (int i = 0; i < 1; i++) {
+        //     messageSender.sendNewOrderSingle();
+        //     System.out.println("Sending message " + i);
+        //     Thread.sleep(1000); // wait for 1 second between messages
+        // }
+        try {
+            System.out.println("Sending order ");
+            //messageSender.sendNewOrderSingle();
+            for (int i = 0; i < 10; i++) {
+                messageSender.sendNewOrderSingle();
+                System.out.println("Sending message " + i);
+                Thread.sleep(1000); // wait for 1 second between messages
+                System.out.println("Order sent successfully");
+            }
+        } catch (Exception ex) {
+            System.out.println("Failed to send order: " + ex.getMessage());
         }
 
+        System.out.println("Stopping initiator...");
         initiator.stop();
     }
 }

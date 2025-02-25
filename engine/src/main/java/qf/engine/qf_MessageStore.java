@@ -23,15 +23,16 @@ public class qf_MessageStore implements MessageStore {
 
     private static final Logger logger = Logger.getLogger(qf_MessageStore.class.getName());
 
-    private static final String SEQ_KEY = "{f}s"; // seq hash
-    private static final String MSG_KEY = "{f}m"; // msg hash
-    private static final String SENDER_FIELD = "s";
-    private static final String TARGET_FIELD = "t";
+    private static final String SEQ_KEY = "seq_key"; // seq hash
+    private static final String MSG_KEY = "msg_key"; // msg hash
+    private static final String SENDER_FIELD = "sender_field";
+    private static final String TARGET_FIELD = "target_field";
 
     private int nextSenderSeqNum = 1;
     private int nextTargetSeqNum = 1;
-    private String host = System.getenv("MDB_HOST");
+    //private String host = System.getenv("MDB_HOST");
     private int port1 = 6379;
+    private String host = "127.0.0.1";
 
     public qf_MessageStore() {
 
@@ -46,7 +47,7 @@ public class qf_MessageStore implements MessageStore {
             .address(NodeAddress.builder()
             .host(host)
             .port(port1).build())
-            .useTLS(true)
+            .useTLS(false)
             .build();
 
         // Initialize the client
@@ -54,7 +55,6 @@ public class qf_MessageStore implements MessageStore {
             logger.info("Initializing MemoryDB connection to host " + host);
             this.glideClient = GlideClusterClient.createClient(config).get();
             logger.info("Glide client created successfully");
-            System.out.println("Glide client created successfully");
             
             // Test the connection by pinging the cluster
             String pingResponse = this.glideClient.ping(gs("PING")).get().toString();
@@ -110,12 +110,17 @@ public class qf_MessageStore implements MessageStore {
     @Override
     public boolean set(int sequence, String message) throws IOException {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'set'");
+        //Adds a raw fix messages to the store with the given sequence number. 
+        //(Most implementations just append the message data to the store so be careful about assuming random access behavior.)
+        logger.info("Setting message: " + message);
+        return true;
+        //throw new UnsupportedOperationException("Unimplemented method 'set'");
     }
 
     @Override
     public void get(int startSequence, int endSequence, Collection<String> messages) throws IOException {
         // TODO Auto-generated method stub
+        logger.info("Getting messages from " + startSequence + " to " + endSequence);
         throw new UnsupportedOperationException("Unimplemented method 'get'");
     }
 
@@ -131,6 +136,7 @@ public class qf_MessageStore implements MessageStore {
         }
     }
 
+    // fix:seq:{SenderCompID}:{TargetCompID}:{SessionQualifier}:{InstanceID}:{Direction}
     @Override
     public void incrNextTargetMsgSeqNum() throws IOException {
         // TODO Auto-generated method stub
@@ -139,8 +145,7 @@ public class qf_MessageStore implements MessageStore {
 
     @Override
     public Date getCreationTime() throws IOException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCreationTime'");
+        return new Date();
     }
 
     @Override

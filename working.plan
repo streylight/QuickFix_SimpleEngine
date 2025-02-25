@@ -8,13 +8,23 @@ Legend
 ## TODO
 
 high
-* implement getCreationTime
+* implement set method in MessageStore to write raw message to db
 * clean up print statements for glide connectivity
 * improve set next & inc seq number logic
 
 low
 * flush out order flow for new order
 * determine if inc target seq num makes any sense (i dont think so)
+
+## [02-25-25]
+
+- cleaned up client message sender code and resolved issue with missing tag
+- updated FIX from v4.0 to v4.4 and updated NewOrderSingle method to match new constuctor
+
+## [02-19-25]
+- fucked around in vscode replacing Amazon Q with co-pilot
+- troubleshooting why client message isn't triggering new order single onMessage call
+- fixed engine to start receiving messages again.  MessageStore set function was throwing an exception which wasn't being caught
 
 ## [02-18-25]
 - added functionality to write set and incr sender seq number to Amazon MemoryDB
