@@ -1,3 +1,5 @@
+** NOTE: this repo is currently under development
+
 # QuickFix_SimpleEngine
 
 QuickFix_SimpleEngine is a simple FIX (Financial Information eXchange) engine and client implementation built on QuickFIX/J. This project provides a basic framework for sending and receiving FIX messages, making it suitable for financial applications that require FIX protocol communication.
