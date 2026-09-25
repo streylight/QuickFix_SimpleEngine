@@ -31,3 +31,12 @@ pom.xml.versionsBackup
 pom.xml.next
 release.properties
 
+
+# Local machine metadata and environment secrets
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# Personal agent guidance (kept locally)
+/AGENTS.md
